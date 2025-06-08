@@ -28,9 +28,8 @@ Ini adalah skrip Python yang dirancang untuk melakukan serangan brute force terh
 1.  **Clone repositori ini:**
     ```bash
     git clone https://github.com/YourUsername/your-repo-name.git
-    cd your-repo-name
+    cd Brute_force_ssh_idn
     ```
-    (Ganti `YourUsername` dan `your-repo-name` dengan detail repositori Anda.)
 
 2.  **Instal library yang dibutuhkan:**
     ```bash
