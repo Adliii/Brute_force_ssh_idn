@@ -51,7 +51,7 @@ Ini adalah skrip Python yang dirancang untuk melakukan serangan brute force terh
 
 2.  **Jalankan skrip:**
     ```bash
-    python hybrid_brute.py
+    python Brute_force_ssh_idn.py
     ```
 
 3.  **Ikuti prompt:**
